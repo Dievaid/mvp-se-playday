@@ -49,7 +49,9 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
     }
   };
 
-  const isAvailable = gameData.playersNeeded > 0 && !gameData.joinedPlayers.includes(user?.email || "");
+  const isAvailable = gameData.playersNeeded > 0;
+  const isLoggedin = user !== null;
+  const hasNotJoined = !gameData.joinedPlayers.includes(user?.email ?? "");
 
   return (
 	<Card className="w-[250px] flex flex-col items-center justify-between p-6 gap-4">
@@ -65,19 +67,13 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
 		</div>
   
 		<div className="mt-auto w-full flex justify-center">
-		  {isAvailable ? (
-			<Button 
-			  className="bg-teal-600 hover:bg-teal-800 w-full" 
-			  onClick={handleJoinGame}
-			>
+		  {(isAvailable && isLoggedin && hasNotJoined) ? (
+			<Button onClick={handleJoinGame} className="w-full">
 			  Join Game
 			</Button>
 		  ) : (
-			<Button 
-			  className="w-full bg-gray-300 text-gray-700 rounded-full cursor-not-allowed" 
-			  disabled
-			>
-			  Not Available
+			<Button disabled className="w-full">
+			  {isLoggedin ? (isAvailable ? "Already joined" : "Game full") : "Not available"}
 			</Button>
 		  )}
 		</div>

@@ -37,8 +37,7 @@ function GamesPage() {
   const { user } = useContext(AuthContext);
 
   useEffect(() => {
-    if (user) {
-      const gamesRef = collection(firestore, "games");
+    const gamesRef = collection(firestore, "games");
       const q = query(gamesRef);
 
       const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -48,13 +47,13 @@ function GamesPage() {
         }));
         setUserGames(userGames);
       });
+      if (user) {
+        const rentalsRef = collection(firestore, "rentals");
+        const rentalQuery = query(rentalsRef, where("owner", "==", user.email));
 
-      const rentalsRef = collection(firestore, "rentals");
-      const rentalQuery = query(rentalsRef, where("owner", "==", user.email));
-
-      const rentalUnsubscribe = onSnapshot(rentalQuery, (querySnapshot) => {
-        const rentalData = querySnapshot.docs.map((doc) => ({
-          ...(doc.data() as Rental),
+        const rentalUnsubscribe = onSnapshot(rentalQuery, (querySnapshot) => {
+          const rentalData = querySnapshot.docs.map((doc) => ({
+            ...(doc.data() as Rental),
         }));
         setRentals(rentalData);
       });
@@ -67,7 +66,13 @@ function GamesPage() {
     }
   }, [user]);
 
-  const handleAddGame = () => setShowAddGameModal(true);
+  const handleAddGame = () => {
+    if (!user) {
+      alert("Please sign in to add a game.");
+      return;
+    }
+    setShowAddGameModal(true);
+  };
   const handleCloseModal = () => {
     setShowAddGameModal(false);
     setGameData({ title: "", description: "", gameType: "", playersNeeded: 0, creator: "", date: "", duration: 0, rentalId: "", id: "", joinedPlayers: [] });
@@ -115,7 +120,7 @@ function GamesPage() {
       alert("Failed to add the game. Please try again.");
     }
   };
-
+  const isLoggedIn = user !== null;
   const buttonClass =
     "px-8 py-3 bg-[#065C64] text-white text-lg font-medium rounded-full shadow-lg hover:shadow-2xl transition-shadow duration-300 transform hover:scale-105";
 
