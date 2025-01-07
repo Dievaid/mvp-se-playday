@@ -5,7 +5,6 @@ import { AuthContext } from "./context/auth-provider";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardTitle } from "./ui/card";
 
-// Define the structure of the 'game' prop
 export interface Game {
   id: string;
   title: string;
@@ -27,25 +26,20 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
   const [gameData, setGameData] = useState<Game>(game);
   const {user} = useContext(AuthContext);
 
-  // Effect to update the state if the game prop changes
   useEffect(() => {
     setGameData(game);
   }, [game]);
 
-  // Function to handle joining a game
   const handleJoinGame = async () => {
     try {
-      // Decrease playersNeeded by 1
       const updatedGameData = { 
         ...gameData, 
         playersNeeded: gameData.playersNeeded - 1, 
         joinedPlayers: [...gameData.joinedPlayers, user?.email].filter((email): email is string => email !== null && email !== undefined) 
       };
-      
-      // Update the game in Firestore
+
       await updateDoc(doc(firestore, "games", gameData.id), updatedGameData);
       
-      // Update the local state
       setGameData(updatedGameData);
 
       alert("Joined the game!");
@@ -70,7 +64,6 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
 		  <p className="text-gray-600 font-medium">When and where: <span className="font-normal text-blue-500">{gameData.rentalId}</span></p>
 		</div>
   
-		{/* Button at the bottom, centered */}
 		<div className="mt-auto w-full flex justify-center">
 		  {isAvailable ? (
 			<Button 

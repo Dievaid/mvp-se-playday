@@ -1,11 +1,10 @@
 import React, { useContext, useState, useEffect } from "react";
 import GameCard, { Game } from "@/components/GameCard";
-import { GameCardProps } from "@/components/GameCard";
-import { collection, doc, setDoc, getDoc, query, where, onSnapshot } from "firebase/firestore";
-import { firestore } from "../lib/firebase"; // Update with your Firebase config file path
-import { v4 as uuidv4 } from "uuid"; // To generate unique IDs
+import { collection, doc, setDoc, query, where, onSnapshot } from "firebase/firestore";
+import { firestore } from "../lib/firebase";
+import { v4 as uuidv4 } from "uuid";
 import { AuthContext } from "@/components/context/auth-provider";
-import { Timestamp } from "firebase/firestore"; // To work with Firestore timestamps
+import { Timestamp } from "firebase/firestore";
 
 
 interface Rental {
@@ -34,32 +33,11 @@ function GamesPage() {
     id: "",
     joinedPlayers: [],
   });
-  const [username, setUsername] = useState("");
-  const [rentals, setRentals] = useState<Rental[]>([]); // To store available rentals
+  const [rentals, setRentals] = useState<Rental[]>([]);
   const { user } = useContext(AuthContext);
 
   useEffect(() => {
     if (user) {
-      // Fetch the username from the 'users' collection
-      const fetchUsername = async () => {
-        try {
-          const userDocRef = doc(firestore, "users", user.uid);
-          const userDoc = await getDoc(userDocRef);
-
-          if (userDoc.exists()) {
-            const userData = userDoc.data();
-            setUsername(userData.name || "User"); // Assuming 'name' is the field storing the username
-          } else {
-            console.error("User document does not exist");
-          }
-        } catch (error) {
-          console.error("Error fetching username:", error);
-        }
-      };
-
-      fetchUsername();
-
-      // Real-time listener for games
       const gamesRef = collection(firestore, "games");
       const q = query(gamesRef);
 
@@ -71,7 +49,6 @@ function GamesPage() {
         setUserGames(userGames);
       });
 
-      // Fetch rentals where the user is the owner
       const rentalsRef = collection(firestore, "rentals");
       const rentalQuery = query(rentalsRef, where("owner", "==", user.email));
 
@@ -109,10 +86,8 @@ function GamesPage() {
     }
 
     try {
-      // Generate a unique ID for the new game
       const uniqueID = uuidv4();
 
-      // Find the rental data by rentalId
       const selectedRental = rentals.find((rental) => rental.owner === user?.email);
       console.log(rentals);
       console.log(selectedRental);
@@ -122,7 +97,6 @@ function GamesPage() {
         return;
       }
 
-      // Add the new game to Firestore
       await setDoc(doc(collection(firestore, "games"), uniqueID), {
         ...gameData,
         id: uniqueID,
@@ -147,7 +121,6 @@ function GamesPage() {
 
     return (
       <div className="flex flex-col">
-        {/* Header with Add Game Button */}
         <div className="flex justify-between items-center p-2 bg-gray-50 h-full">
           <h1 className="text-2xl font-semibold text-[#065C64] flex-grow text-center">Games</h1>
           <button
@@ -158,7 +131,6 @@ function GamesPage() {
           </button>
         </div>
     
-        {/* Main Content */}
         <div className="flex flex-col items-center h-screen bg-gray-50">
           <div className="grid lg:grid-cols-4 sm:grid-cols-1 md:grid-cols-3 gap-4 mt-8">
             {games.map((game) => (
@@ -167,7 +139,6 @@ function GamesPage() {
           </div>
         </div>
     
-        {/* Add Game Modal */}
         {showAddGameModal && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
             <div className="bg-white p-8 rounded-lg shadow-md w-2/5 text-[#065C64]">
