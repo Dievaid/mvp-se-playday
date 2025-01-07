@@ -8,6 +8,7 @@ import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
 import MyFields from './pages/MyFields';
 import { AuthProvider } from './components/context/auth-provider';
+import { FieldsPage } from './pages/FieldsPage';
 
 function App() {
   return (
@@ -30,7 +31,7 @@ function App() {
             <Route path="/about" element={<AboutPage />} />
 
             {/* Fields Page */}
-            <Route path="/fields" element={<div>Fields Page</div>} />
+            <Route path="/fields" element={<FieldsPage />} />
 
             {/* My Fields Page */}
             <Route path="/my-fields" element={<MyFields />} />
